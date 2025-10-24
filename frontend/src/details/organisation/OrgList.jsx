@@ -1,44 +1,139 @@
-
-import { useState, useEffect } from 'react';
-import { fetchOrganisations } from '../../api/OrgApi';
+import { Eye, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { fetchOrganisations, deleteOrganisation } from '../../api/OrgApi';
+import { fetchUsers } from '../../api/UserApi';
 import { useNavigate } from 'react-router-dom';
+
+const getStatusBadge = (status) => {
+  switch (status) {
+    case 'Active':
+      return 'bg-green-50 text-green-600 border-green-200';
+    case 'Blocked':
+      return 'bg-red-50 text-red-600 border-red-200';
+    case 'Inactive':
+      return 'bg-gray-50 text-gray-600 border-gray-200';
+    default:
+      return 'bg-gray-50 text-gray-600 border-gray-200';
+  }
+};
 
 export default function OrgList() {
   const [orgs, setOrgs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(null); // Track which org is being deleted
   const navigate = useNavigate();
 
+  // Fetch orgs (use in useEffect & after delete)
+  const loadOrgs = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchOrganisations();
+      setOrgs(data);
+    } catch (error) {
+      console.error('Error loading organizations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetchOrganisations()
-      .then(data => setOrgs(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    loadOrgs();
   }, []);
 
-  if (loading) return <div>Loading organizations...</div>;
+  const handleDelete = async (id) => {
+    if (deleting === id) return;
+    try {
+      setDeleting(id); 
+      const users = await fetchUsers();
+      const relatedUsers = users.filter(u => u.organization_id === id);
+      if (relatedUsers.length > 0) {
+        alert("Cannot delete organization with associated users.");
+        setDeleting(null);
+        return;
+      }
+      await deleteOrganisation(id);
+      setOrgs(prevOrgs => prevOrgs.filter(org => org.id !== id));
+      await loadOrgs();
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert("Failed to delete organization. Please try again.");
+      await loadOrgs();
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  if (loading) return <div className="px-6 py-6">Loading organizations...</div>;
+
+  if (orgs.length === 0) {
+    return (
+      <div className="px-6 py-6 text-center text-gray-500">
+        No organizations found.
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <table className="table-auto w-full border">
-        <thead>
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
-            <th className="border p-2">#</th>
-            <th className="border p-2">Name</th>
-            <th className="border p-2">Email</th>
-            <th className="border p-2">Phone</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Sr. No</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Organizations</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Pending requests</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-white divide-y divide-gray-200">
           {orgs.map((org, idx) => (
-            <tr
-              key={org.id}
-              onClick={() => navigate(`/organizations/${org.id}`)}
-              className="border p-2 cursor-pointer hover:bg-gray-100"
+            <tr 
+              key={org.id} 
+              className={`hover:bg-gray-50 ${deleting === org.id ? 'opacity-50' : ''}`}
             >
-              <td className="border p-2">{idx + 1}</td>
-              <td className="border p-2">{org.name}</td>
-              <td className="border p-2">{org.primary_admin_email}</td>
-              <td className="border p-2">{org.contact_phone}</td>
+              <td className="px-6 py-4">{idx + 1}</td>
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white font-semibold">
+                    {org.name?.charAt(0) || "O"}
+                  </div>
+                  <span className="text-sm">{org.name || "{ Organization name }"}</span>
+                </div>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-600">
+                {org.pending_requests || "45 pending requests"}
+              </td>
+              <td className="px-6 py-4">
+                <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadge(org.status)}`}>
+                  <span className={`w-2 h-2 rounded-full ${
+                    org.status === 'Active' ? 'bg-green-500'
+                      : org.status === 'Blocked' ? 'bg-red-500'
+                      : 'bg-gray-400'
+                  }`}></span>
+                  {org.status || "Active"}
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                    onClick={() => navigate(`/organizations/${org.id}`)}
+                    disabled={deleting === org.id}
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(org.id);
+                    }}
+                    disabled={deleting === org.id}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

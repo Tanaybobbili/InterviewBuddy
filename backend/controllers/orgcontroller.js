@@ -45,14 +45,14 @@ exports.updateOrganisation = async (req,res) =>{
     }
 };
 
-exports.deleteOrganisation = async (req,res) =>{
+exports.deleteOrganisation = async (req, res) => {
     try {
         const org = await Organisations.findByPk(req.params.id);
         if (!org) {
             return res.status(404).json({ error: 'Organisation not found' });
         }
         await org.destroy();
-        res.status(204).send();
+        res.status(200).json({ message: 'Organisation deleted successfully' });
     } catch (error) {
         console.error('Error deleting organisation:', error);
         res.status(500).json({ error: 'Internal server error' });

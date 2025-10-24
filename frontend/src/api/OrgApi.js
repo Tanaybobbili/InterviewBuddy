@@ -31,11 +31,16 @@ export async function updateOrganisation(id, data) {
   if (!res.ok) throw new Error('Error updating organisation');
   return res.json();
 }
-
-export async function deleteOrganisation(id) {
-  const res = await fetch(`${API_BASE}/api/organisations/${id}`, {
-    method: 'DELETE'
-  });
-  if (!res.ok) throw new Error('Error deleting organisation');
-  return res.json();
-}
+export const deleteOrganisation = async (id) => {
+    const response = await fetch(`/api/organisations/${id}`, {
+        method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to delete organisation');
+    }
+    if (response.status === 204) {
+        return { success: true };
+    }
+    return response.json();
+};
