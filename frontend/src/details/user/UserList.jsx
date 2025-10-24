@@ -1,53 +1,10 @@
-// import React, { useEffect, useState } from 'react';
-// import { fetchUsers } from '../../api/UserApi';
 
-// export default function UserList({ orgId }) {
-//   const [users, setUsers] = useState([]);
-//   const [loading, setLoading] = useState(true);
 
-//   useEffect(() => {
-//     fetchUsers()
-//       .then(list => setUsers(list.filter(u => u.organization_id === orgId)))
-//       .finally(() => setLoading(false));
-//   }, [orgId]);
-
-//   if (loading) return <div>Loading users...</div>;
-//   if (!users.length) return <div>No users found.</div>;
-
-//   return (
-//     <table className="w-full border">
-//       <thead>
-//         <tr>
-//           <th className="border p-2">#</th>
-//           <th className="border p-2">User name</th>
-//           <th className="border p-2">Role</th>
-//           <th className="border p-2">Action</th>
-//         </tr>
-//       </thead>
-//       <tbody>
-//         {users.map((u, idx) => (
-//           <tr key={u.id}>
-//             <td className="border p-2">{idx + 1}</td>
-//             <td className="border p-2">{u.name}</td>
-//             <td className="border p-2">
-//               <span className={u.role === 'Admin' ? 'text-green-700 bg-green-100 px-2 rounded' : 'text-orange-700 bg-orange-100 px-2 rounded'}>
-//                 {u.role}
-//               </span>
-//             </td>
-//             <td className="border p-2">
-//               {/* Insert edit/delete icons and actions here if needed */}
-//             </td>
-//           </tr>
-//         ))}
-//       </tbody>
-//     </table>
-//   );
-// }
-
+import { Edit, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { fetchUsers } from '../../api/UserApi';
+import { fetchUsers, deleteUser } from '../../api/UserApi';
 
-export default function UserList({ orgId, refreshFlag }) {
+export default function UserList({ orgId, refreshFlag}) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -58,37 +15,63 @@ export default function UserList({ orgId, refreshFlag }) {
       .finally(() => setLoading(false));
   }, [orgId, refreshFlag]);
 
+  const handleDelete = async (id) => {
+  setUsers(prev => prev.filter(u => u.id !== id));
+
+  try {
+    await deleteUser(id);
+  } catch (err) {
+    console.error('Failed to delete user', err);
+    setLoading(true);
+    fetchUsers()
+      .then(list => setUsers(list.filter(u => u.organization_id === orgId)))
+      .finally(() => setLoading(false));
+  }
+};
+
   if (loading) return <div>Loading users...</div>;
   if (!users.length) return <div>No users found.</div>;
 
   return (
-    <table className="w-full rounded shadow border">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="border p-2 text-left">Sr. No</th>
-          <th className="border p-2 text-left">User name</th>
-          <th className="border p-2 text-left">Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((u, idx) => (
-          <tr key={u.id} className="hover:bg-gray-50">
-            <td className="border p-2">{idx + 1}</td>
-            <td className="border p-2">{u.name}</td>
-            <td className="border p-2">
-              <span
-                className={
-                  u.role === "Admin"
-                    ? "bg-green-100 text-green-700 px-2 py-1 rounded text-xs"
-                    : "bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs"
-                }
-              >
-                {u.role}
-              </span>
-            </td>
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Sr. No</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">User name</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Role</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Action</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {users.map((user, idx) => (
+            <tr key={user.id} className="hover:bg-gray-50">
+              <td className="px-6 py-4">{idx + 1}</td>
+              <td className="px-6 py-4">{user.name}</td>
+              <td className="px-6 py-4">
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
+                  user.role === "Admin"
+                    ? "bg-green-50 text-green-600 border-green-200"
+                    : "bg-orange-50 text-orange-600 border-orange-200"
+                }`}>{user.role}</span>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                    onClick={() => handleDelete(user.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

@@ -108,9 +108,7 @@ export default function AddOrg({ onClose, onSuccess }) {
             {errors.contact_phone && <span className="text-red-500 text-xs">{errors.contact_phone}</span>}
           </div>
 
-          {/* Repeat the above div structure for other fields (admin name, support email, alternate phone, website, timezone, etc) */}
-
-          {/* Action Buttons */}
+          
           <div className="flex justify-end gap-2 mt-8">
             <Button type="button" className="bg-gray-100 text-black" onClick={onClose}>
               Cancel
