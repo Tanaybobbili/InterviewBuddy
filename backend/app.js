@@ -13,10 +13,10 @@ sequelize.sync().then(() => { console.log('Database synced') }).catch((err) => {
 const orgroutes = require('./routes/organisations');
 const userroutes = require('./routes/users');
 
-app.use(cors({origin: 'https://localhost:5173', credentials: true}));
+app.use(cors({origin: 'http://localhost:3000', credentials: true}));
 app.use(express.json());
 
-app.use('/api/organizations', orgroutes);
+app.use('/api/organisations', orgroutes);
 app.use('/api/users', userroutes);
 
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchOrganizations } from '../../api/OrgApi';
+import { fetchOrganisations } from '../../api/OrgApi';
 import Button from '../../components/Button';
 
 export default function OrgList() {
@@ -7,7 +7,7 @@ export default function OrgList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrganizations()
+    fetchOrganisations()
       .then(data => setOrgs(data))
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -17,10 +17,6 @@ export default function OrgList() {
 
   return (
     <div>
-      <div className="flex justify-between mb-4">
-        <h1 className="text-xl font-bold">Organizations</h1>
-        <Button>Add Organization</Button>
-      </div>
       <table className="table-auto w-full border">
         <thead>
           <tr>
