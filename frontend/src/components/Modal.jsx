@@ -1,9 +1,41 @@
+
+// export default function Modal({ children }) {
+//   return (
+//     <div className="fixed inset-0 bg-gray-500/20 flex justify-end">
+//       <div className="bg-white h-full w-1/2 shadow-lg relative">
+//         <div className="p-6 h-full overflow-y-auto">
+//           {children}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default function Modal({ children }) {
+//   return (
+//     <div className="fixed inset-0 bg-gray-500/20 flex justify-end z-50">
+//       <div className="bg-white h-full w-1/2 shadow-lg relative">
+//         <div className="p-6 h-full overflow-y-auto">
+//           {children}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
 export default function Modal({ children, onClose }) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded shadow-lg w-96">
-        <button className="float-right" onClick={onClose}>X</button>
-        {children}
+    <div className="fixed inset-0 bg-gray-500/20 flex justify-end z-50">
+      <div className="bg-white h-full w-1/2 shadow-lg relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-6 text-2xl text-gray-400 hover:text-gray-600"
+          aria-label="Close"
+          type="button"
+        >
+          &times;
+        </button>
+        <div className="p-6 h-full overflow-y-auto">{children}</div>
       </div>
     </div>
   );

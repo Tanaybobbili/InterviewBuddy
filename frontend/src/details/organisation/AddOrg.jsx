@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
@@ -20,54 +21,109 @@ export default function AddOrg({ onClose, onSuccess }) {
     status: 'Active'
   });
 
+  const [errors, setErrors] = useState({});
+
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await addOrganisation(form);
-    onSuccess && onSuccess();
-    onClose();
+    try {
+      await addOrganisation(form);
+      onSuccess && onSuccess();
+      onClose();
+    } catch (err) {
+      setErrors({ submit: err.message });
+    }
   }
 
   return (
     <Modal onClose={onClose}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input name="name" placeholder="Organization name" value={form.name} onChange={handleChange} required />
-        <input name="slug" placeholder="Organization SLUG" value={form.slug} onChange={handleChange} required />
+      <div className="h-full flex flex-col">
+        {/* Modal Header */}
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-2xl font-bold">Add Organization</h2>
+        </div>
 
-        <input name="primary_admin_name" placeholder="Primary Admin name" value={form.primary_admin_name} onChange={handleChange} required />
-        <input name="primary_admin_email" placeholder="Primary Admin Mail-id" value={form.primary_admin_email} onChange={handleChange} required />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
+          
+          {/* Organization Name */}
+          <div>
+            <label className="block text-base font-medium mb-1">Name of the organization</label>
+            <input
+              name="name"
+              placeholder="Type here"
+              value={form.name}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base"
+              required
+            />
+            <span className="block mt-1 text-xs text-gray-400">Hint: Enter the official name</span>
+            {errors.name && <span className="text-red-500 text-xs">{errors.name}</span>}
+          </div>
 
-        <input name="support_email" placeholder="Support Email ID" value={form.support_email} onChange={handleChange} />
-        <input name="contact_phone" placeholder="Phone no" value={form.contact_phone} onChange={handleChange} />
-        <input name="alternate_phone" placeholder="Alternative phone no" value={form.alternate_phone} onChange={handleChange} />
+          {/* Slug */}
+          <div>
+            <label className="block text-base font-medium mb-1">Slug</label>
+            <input
+              name="slug"
+              placeholder="Type here"
+              value={form.slug}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base"
+              required
+            />
+            <span className="block mt-1 text-xs text-gray-400">Hint: Unique identifier for the org</span>
+            {errors.slug && <span className="text-red-500 text-xs">{errors.slug}</span>}
+          </div>
 
-        <input name="website_url" placeholder="Official website URL" value={form.website_url} onChange={handleChange} />
+          {/* Organization Email */}
+          <div>
+            <label className="block text-base font-medium mb-1">Organization mail</label>
+            <input
+              name="primary_admin_email"
+              placeholder="Type here"
+              value={form.primary_admin_email}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base"
+              required
+            />
+            <span className="block mt-1 text-xs text-gray-400">Hint: Admin email for contact</span>
+            {errors.primary_admin_email && <span className="text-red-500 text-xs">{errors.primary_admin_email}</span>}
+          </div>
 
-        {/* Coordinators, Timezone, Language, Status */}
-        <select name="max_coordinators" value={form.max_coordinators} onChange={handleChange}>
-          <option value={5}>Upto 5 Coordinators</option>
-          <option value={10}>Upto 10 Coordinators</option>
-        </select>
+          {/* Contact */}
+          <div>
+            <label className="block text-base font-medium mb-1">Contact</label>
+            <input
+              name="contact_phone"
+              placeholder="Type here"
+              value={form.contact_phone}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base"
+            />
+            <span className="block mt-1 text-xs text-gray-400">Hint: Main contact number</span>
+            {errors.contact_phone && <span className="text-red-500 text-xs">{errors.contact_phone}</span>}
+          </div>
 
-        <input name="timezone_name" placeholder="Common name (Timezone)" value={form.timezone_name} onChange={handleChange} />
-        <input name="timezone_region" placeholder="Region (Timezone)" value={form.timezone_region} onChange={handleChange} />
+          {/* Repeat the above div structure for other fields (admin name, support email, alternate phone, website, timezone, etc) */}
 
-        <select name="language" value={form.language} onChange={handleChange}>
-          <option>English</option>
-          {/* Add other languages here */}
-        </select>
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-2 mt-8">
+            <Button type="button" className="bg-gray-100 text-black" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-purple-600 text-white">
+              Add
+            </Button>
+          </div>
 
-        <select name="status" value={form.status} onChange={handleChange}>
-          <option>Active</option>
-          <option>Inactive</option>
-          <option>Blocked</option>
-        </select>
-
-        <Button type="submit">Add Organization</Button>
-      </form>
+          {/* Form submit error */}
+          {errors.submit && <span className="text-red-500">{errors.submit}</span>}
+        </form>
+      </div>
     </Modal>
   );
 }

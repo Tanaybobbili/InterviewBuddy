@@ -15,3 +15,27 @@ export async function addOrganisation(data) {
   if (!res.ok) throw new Error('Error adding organisation');
   return res.json();
 }
+
+export async function fetchOrganisationById(id) {
+  const res = await fetch(`${API_BASE}/api/organisations/${id}`);
+  if (!res.ok) throw new Error('Error fetching organisation');
+  return res.json();
+}
+
+export async function updateOrganisation(id, data) {
+  const res = await fetch(`${API_BASE}/api/organisations/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('Error updating organisation');
+  return res.json();
+}
+
+export async function deleteOrganisation(id) {
+  const res = await fetch(`${API_BASE}/api/organisations/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) throw new Error('Error deleting organisation');
+  return res.json();
+}
