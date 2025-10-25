@@ -1,8 +1,9 @@
+
 import { Eye, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { fetchOrganisations, deleteOrganisation } from '../../api/OrgApi';
-import { fetchUsers } from '../../api/UserApi';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { deleteOrganisation } from '../../api/OrgApi';
+import { fetchUsers } from '../../api/UserApi';
 
 const getStatusBadge = (status) => {
   switch (status) {
@@ -17,33 +18,15 @@ const getStatusBadge = (status) => {
   }
 };
 
-export default function OrgList() {
-  const [orgs, setOrgs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(null); // Track which org is being deleted
+export default function OrgList({ orgs, refreshList }) {
+  const [deleting, setDeleting] = useState(null);
   const navigate = useNavigate();
-
-  // Fetch orgs (use in useEffect & after delete)
-  const loadOrgs = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchOrganisations();
-      setOrgs(data);
-    } catch (error) {
-      console.error('Error loading organizations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadOrgs();
-  }, []);
 
   const handleDelete = async (id) => {
     if (deleting === id) return;
+
     try {
-      setDeleting(id); 
+      setDeleting(id);
       const users = await fetchUsers();
       const relatedUsers = users.filter(u => u.organization_id === id);
       if (relatedUsers.length > 0) {
@@ -52,20 +35,16 @@ export default function OrgList() {
         return;
       }
       await deleteOrganisation(id);
-      setOrgs(prevOrgs => prevOrgs.filter(org => org.id !== id));
-      await loadOrgs();
+      if (refreshList) refreshList(); // trigger parent reload
     } catch (err) {
       console.error('Delete error:', err);
       alert("Failed to delete organization. Please try again.");
-      await loadOrgs();
     } finally {
       setDeleting(null);
     }
   };
 
-  if (loading) return <div className="px-6 py-6">Loading organizations...</div>;
-
-  if (orgs.length === 0) {
+  if (!orgs || orgs.length === 0) {
     return (
       <div className="px-6 py-6 text-center text-gray-500">
         No organizations found.
@@ -98,7 +77,7 @@ export default function OrgList() {
                     <img 
                       src={org.logo_url}
                       alt={org.name}
-                      className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white font-semibold"
+                      className="w-10 h-10 rounded-lg object-cover"
                     />
                   ) : (
                     <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white font-semibold">
@@ -109,7 +88,7 @@ export default function OrgList() {
                 </div>
               </td>
               <td className="px-6 py-4 text-sm text-gray-600">
-                {org.pending_requests || "45 pending requests"}
+                {org.pending_requests || "0 pending requests"}
               </td>
               <td className="px-6 py-4">
                 <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadge(org.status)}`}>

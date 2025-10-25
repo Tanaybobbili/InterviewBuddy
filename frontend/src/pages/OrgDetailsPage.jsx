@@ -6,7 +6,7 @@ import { fetchOrganisationById} from '../api/OrgApi';
 import UserList from '../details/user/UserList';
 import AddUser from '../details/user/AddUser';
 import OrgDetails from '../details/organisation/OrgDetails';
-import { Plus, Edit, Upload } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import Button from '../components/Button';
 import { API_BASE } from '../api/config';
 
