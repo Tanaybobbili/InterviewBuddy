@@ -94,9 +94,17 @@ export default function OrgList() {
               <td className="px-6 py-4">{idx + 1}</td>
               <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white font-semibold">
-                    {org.name?.charAt(0) || "O"}
-                  </div>
+                  {org.logo_url ? (
+                    <img 
+                      src={org.logo_url}
+                      alt={org.name}
+                      className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white font-semibold"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white font-semibold">
+                      {org.name?.charAt(0).toUpperCase() || "O"}
+                    </div>
+                  )}
                   <span className="text-sm">{org.name || "{ Organization name }"}</span>
                 </div>
               </td>
