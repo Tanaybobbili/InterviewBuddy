@@ -53,7 +53,7 @@ exports.deleteUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        user.destroy();
+        await user.destroy();
         res.status(204).send();
     } catch(error) {
         console.error('Error deleting user:', error);

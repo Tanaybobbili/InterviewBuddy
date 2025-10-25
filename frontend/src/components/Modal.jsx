@@ -1,27 +1,4 @@
 
-// export default function Modal({ children }) {
-//   return (
-//     <div className="fixed inset-0 bg-gray-500/20 flex justify-end">
-//       <div className="bg-white h-full w-1/2 shadow-lg relative">
-//         <div className="p-6 h-full overflow-y-auto">
-//           {children}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default function Modal({ children }) {
-//   return (
-//     <div className="fixed inset-0 bg-gray-500/20 flex justify-end z-50">
-//       <div className="bg-white h-full w-1/2 shadow-lg relative">
-//         <div className="p-6 h-full overflow-y-auto">
-//           {children}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 
 export default function Modal({ children, onClose }) {
   return (

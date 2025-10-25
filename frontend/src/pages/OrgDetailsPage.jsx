@@ -175,7 +175,7 @@ export default function OrgDetailsPage() {
               ></span>
               {org.status}
             </span>
-            <button onClick={() => handleStatusChange(org.id)} className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+            <button onClick={() => handleStatusChange(org.id)} className="text-purple-600 hover:text-purple-700 text-sm font-medium cursor-pointer">
               Change status
             </button>
           </div>

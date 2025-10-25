@@ -9,12 +9,13 @@
     try {
         await sequelize.authenticate();
         console.log('Database connected');
-        await sequelize.sync();
+        await sequelize.sync({alter: true});
         console.log('Database synced');
     } catch (err) {
         console.error('Database connection failed:', err);
     }
     })();
+
 
     const orgroutes = require('./routes/organisations');
     const userroutes = require('./routes/users');
