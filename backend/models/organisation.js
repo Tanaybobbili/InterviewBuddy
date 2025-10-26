@@ -1,4 +1,3 @@
-
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
@@ -17,7 +16,6 @@ const Organization = sequelize.define('Organization', {
       notEmpty: { msg: 'Organization name is required' }
     }
   },
-
   slug: { 
     type: DataTypes.STRING, 
     unique: true,
@@ -30,7 +28,6 @@ const Organization = sequelize.define('Organization', {
       notEmpty: { msg: 'Slug is required' }
     }
   },
-
   logo_url: { 
     type: DataTypes.STRING,
     allowNull: true,
@@ -55,7 +52,6 @@ const Organization = sequelize.define('Organization', {
       }
     }
   },
-
   primary_admin_email: { 
     type: DataTypes.STRING,
     unique: true,
@@ -65,7 +61,6 @@ const Organization = sequelize.define('Organization', {
       notEmpty: { msg: 'Primary Admin Email is required' }
     }
   },
-
   support_email: { 
     type: DataTypes.STRING,
     allowNull: true,
@@ -91,7 +86,6 @@ const Organization = sequelize.define('Organization', {
       }
     }
   },
-
   alternate_phone: { 
     type: DataTypes.STRING,
     allowNull: true,
@@ -104,23 +98,41 @@ const Organization = sequelize.define('Organization', {
     }
   },
 
-  // Web info
+  // Web info (with URL normalization in setter)
   website_url: { 
     type: DataTypes.STRING,
     allowNull: true,
+    set(value) {
+      if (value && value.length > 0 && !/^https?:\/\//i.test(value)) {
+        this.setDataValue('website_url', `https://${value}`);
+      } else {
+        this.setDataValue('website_url', value);
+      }
+    },
     validate: {
       isUrlOrEmpty(value) {
         if (value && !/^https?:\/\/.+/.test(value)) {
-          throw new Error('Website URL must be valid');
+          throw new Error('Website URL must be valid and start with http:// or https://');
         }
       }
     }
   },
 
-  // Limits
+  // Limits (with label parsing in setter)
   max_coordinators: { 
     type: DataTypes.ENUM('1', '5', '10', '25', '50', '100'),
-    defaultValue: '5'
+    defaultValue: '5',
+    set(value) {
+      // Accept either pure number or 'Upto X Coordinators'
+      if (typeof value === 'string' && value.startsWith('Upto')) {
+        const num = value.match(/\d+/);
+        if (num) {
+          this.setDataValue('max_coordinators', num[0]);
+          return;
+        }
+      }
+      this.setDataValue('max_coordinators', value);
+    }
   },
 
   // Dropdown / ENUM selections
@@ -133,7 +145,6 @@ const Organization = sequelize.define('Organization', {
     ),
     defaultValue: 'Indian Standard Time'
   },
-
   timezone_region: { 
     type: DataTypes.ENUM(
       'Asia/Kolkata', 
@@ -143,7 +154,6 @@ const Organization = sequelize.define('Organization', {
     ),
     defaultValue: 'Asia/Kolkata'
   },
-
   language: { 
     type: DataTypes.ENUM(
       'English', 
