@@ -2,6 +2,9 @@
   import RootLayout from './layouts/RootLayout';
   import Organizations from './pages/Organisations';
   import OrgDetailsPage from './pages/OrgDetailsPage';
+  import Notifications from './pages/Notifications';
+  import Profile from './pages/Profile';
+  import Support from './pages/Support';
   import './App.css'
 
   function App() {
@@ -14,6 +17,9 @@
               path="/organizations/:id"
               element={<OrgDetailsPage />}
             />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/notifications" element={<Notifications />} />
           </Routes>
         </RootLayout>
       </BrowserRouter>

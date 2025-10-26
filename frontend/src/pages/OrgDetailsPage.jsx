@@ -86,7 +86,7 @@ export default function OrgDetailsPage() {
       const data = await response.json();
       // Update org with new logo URL
       setOrg(prev => ({ ...prev, logo_url: data.logoUrl }));
-      window.location.reload();
+      loadOrg();
     } catch (err) {
       console.error('Image upload error:', err);
       alert('Failed to upload image. Please try again.');

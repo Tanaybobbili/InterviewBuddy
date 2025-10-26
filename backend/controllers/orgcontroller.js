@@ -1,6 +1,6 @@
 const Organisations = require('../models/organisation');
 const { deleteFromCloudinary } = require('../middlewares/upload'); // ✅ fixed path
-
+const Organization = require('../models/organisation');
 exports.getAllOrganisations = async (req, res) => {
   try {
     const organisations = await Organisations.findAll();
@@ -24,15 +24,28 @@ exports.getOrganisationById = async (req, res) => {
   }
 };
 
+
+
 exports.createOrganisation = async (req, res) => {
   try {
-    const newOrg = await Organisations.create(req.body);
-    res.status(201).json(newOrg);
-  } catch (error) {
-    console.error('Error creating organisation:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    let { name, slug, ...rest } = req.body;
+
+    if (!slug) slug = name;
+
+    slug = slug
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')  
+      .replace(/--+/g, '-')         
+      .replace(/^-+|-+$/g, '');    
+
+    const organisation = await Organization.create({ name, slug, ...rest });
+    res.status(201).json(organisation);
+  } catch (err) {
+    console.error('Error creating organisation:', err);
+    res.status(400).json({ error: err.message });
   }
 };
+
 
 exports.updateOrganisation = async (req, res) => {
   try {
