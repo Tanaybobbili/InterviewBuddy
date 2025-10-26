@@ -32,7 +32,7 @@ export async function updateOrganisation(id, data) {
   return res.json();
 }
 export const deleteOrganisation = async (id) => {
-    const response = await fetch(`/api/organisations/${id}`, {
+    const response = await fetch(`${API_BASE}/api/organisations/${id}`, {
         method: 'DELETE'
     });
     
