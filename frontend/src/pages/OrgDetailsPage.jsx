@@ -106,12 +106,19 @@ export default function OrgDetailsPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 flex justify-between items-start">
           <div className="flex gap-6">
             <div className="relative">
-              <div className="w-32 h-32 bg-amber-800 rounded-lg flex items-center justify-center overflow-hidden">
-                <img
-                  src={org.logo_url || '/placeholder-logo.png'}
-                  alt={org.name}
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-32 h-32 bg-purple-300 rounded-lg flex items-center justify-center overflow-hidden">
+                {org.logo_url ? (
+                  <img
+                    src={org.logo_url}
+                    alt={org.name}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-lg flex items-center justify-center bg-purple-300 text-white font-semibold">
+                    {org.name?.charAt(0).toUpperCase() || "O"}
+                  </div>
+                )}
+
                 {uploadingImage && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="text-white text-sm">Uploading...</div>
